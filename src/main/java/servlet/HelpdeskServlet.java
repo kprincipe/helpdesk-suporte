@@ -75,10 +75,137 @@ public class HelpdeskServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         PrintWriter saida = res.getWriter();
 
-        saida.println("oi mundo");
+        String acao = req.getParameter("acao");
+        String pesquisa = req.getParameter("pesquisa");
 
-        for (Chamado chamado : chamados) {
-            
+        if (acao == null) {
+            acao = "listar";
         }
+
+        if (pesquisa == null) {
+            pesquisa = "";
+        }
+
+        res.setContentType("text/html;charset=UTF-8");
+
+        // Cabeçalho
+        saida.println("<!DOCTYPE html>");
+        saida.println("<html lang=\"pt-br\">");
+
+        saida.println("<head>");
+        saida.println("    <meta charset=\"UTF-8\">");
+        saida.println("    <title>Ola IFAM!</title>");
+        saida.println("</head>");
+
+        saida.println("<body>");
+        saida.println("<h1>Helpdesk - Chamados</h1>");
+
+        // Definição de ações
+        if (acao.equals("listar")) {
+            saida.println("<a href=\"helpdesk?acao=criar\">Criar Chamado</a>");
+
+            saida.println("    <form method='GET' action='helpdesk'>");
+            saida.println("        <label type='text' id='filtroPesquisar' name='pesquisa' value='' >Buscar</label>");
+            saida.println("        <input type='text' id='filtroPesquisar' name='pesquisa' value='' placeholder='Pinco Palino'></input>");
+            saida.println("        <button type=\"submit\">Pesquisar</button>");
+            saida.println("    </form>");
+
+            saida.println("    <table border=\"1px\">");
+            saida.println("        <caption>Lista de chamados</caption>");
+            saida.println("        <thead>");
+            saida.println("            <tr>");
+            saida.println("                <th>Título</th>");
+            saida.println("                <th>Solicitante/UF</th>");
+            saida.println("                <th>Descrição</th>");
+            saida.println("                <th>Código do Equipamento</th>");
+            saida.println("                <th>Sala</th>");
+            saida.println("                <th>Departamento</th>");
+            saida.println("                <th>Ação</th>");
+            saida.println("            </tr>");
+            saida.println("            <tbody>");
+
+            for (int i = 0; i < chamados.size(); i++) {
+                Chamado chamadoLista = chamados.get(i);
+
+                if (!chamadoLista.getTitulo().contains(pesquisa)) continue;
+
+                saida.println("                <tr>");
+                saida.println("                    <td>" + chamadoLista.getTitulo() + "</td>");
+                saida.println("                    <td>" + chamadoLista.getSolicitante() + "</td>");
+                saida.println("                    <td>" + chamadoLista.getDescricao() + "</td>");
+                saida.println("                    <td>" + chamadoLista.getCodigoEquipamento().toString() + "</td>");
+                saida.println("                    <td>" + chamadoLista.getSalaAtendimento().toString() + "</td>");
+                saida.println("                    <td>" + chamadoLista.getDepartamento().getSigla() + "</td>");
+                saida.println("                    <td>");
+                saida.println("                        <a href=\"helpdesk?acao=alterar&id=" + i + "\">Alterar</a>");
+                saida.println("                        <a href=\"helpdesk?acao=excluir&id=" + i + "\" onclick=\"return confirm(\"Deseja realmente excluir?\");\">Excluir</a>");
+                saida.println("                    </td>");
+                saida.println("                </tr>");
+            }
+
+            saida.println("            </tbody>");
+            saida.println("        </thead>");
+            saida.println("    </table>");
+        } else if (acao.equals("criar") || acao.equals("alterar")) {
+            String titulo = "Criar Chamado";
+            Chamado chamadoEdicao = null;
+            String idAlterar = null;
+
+            if (acao.equals("alterar")) {
+                idAlterar = req.getParameter("id");
+
+                int indice = Integer.parseInt(idAlterar);
+
+                chamadoEdicao = chamados.get(indice);
+
+                titulo = "Editar Chamado";
+            }
+
+            saida.println("    <h2>" + titulo +"</h2>");
+
+            saida.println("    <form method='POST' action='helpdesk'>");
+
+            saida.println("        <input type='hidden' id='id' name='id' value='" +
+                    (chamadoEdicao != null ? idAlterar : "") + "'></input>");
+
+            saida.println("        <label type='text' for='campoTitulo'>Titulo: </label><br>");
+            saida.println("        <input type='text' id='campoTitulo' name='titulo' value='" + (chamadoEdicao != null ? chamadoEdicao.getTitulo() : "") + "' placeholder='Titulo' required></input>");
+            saida.println("        <br>");
+
+            saida.println("        <label type='text' for='campoSolicitante'>Solicitante: </label><br>");
+            saida.println("        <input type='text' id='campoSolicitante' name='solicitante' value='" + (chamadoEdicao != null ? chamadoEdicao.getSolicitante() : "") + "' placeholder='Nome' required></input>");
+            saida.println("        <br>");
+
+            saida.println("        <label type='text' for='campoDescricao'>Descricao: </label><br>");
+            saida.println("        <textarea id='campoDescricao' name='descricao'  placeholder='Descrição' required>" + (chamadoEdicao != null ? chamadoEdicao.getDescricao() : "") + " </textarea>");
+            saida.println("        <br>");
+
+            saida.println("        <label type='text' for='campoCodigoEquip'>Código do Equipamento: </label><br>");
+            saida.println("        <input type='text' id='campoCodigoEquip' name='codigoequip' value='" + (chamadoEdicao != null ? chamadoEdicao.getCodigoEquipamento() : "") + "' placeholder='10021' required></input>");
+            saida.println("        <br>");
+
+            saida.println("        <label type='text' for='campoSala'>Sala: </label><br>");
+            saida.println("        <input type='text' id='campoSala' name='sala' value='" + (chamadoEdicao != null ? chamadoEdicao.getSalaAtendimento() : "") + "' placeholder='2' required></input>");
+            saida.println("        <br>");
+
+            saida.println("        <label type='text' for='campoDepartamento'>Departamento: </label><br>");
+            saida.println("        <select id='campoDepartamento' name='departamento' value='" + (chamadoEdicao != null ? chamadoEdicao.getDepartamento().getSigla() : "") + "' required>");
+
+            for (int i = 0; i < departamentos.size(); ++i) {
+                boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getDepartamento() != null);
+
+                saida.println("        <option value=" + i + " " + (selecionada ? "selected" : "") + ">" + departamentos.get(i).getSigla() + "</option>");
+            }
+
+            saida.println("        </select>");
+
+            saida.println("        <br>");
+            saida.println("        <button type='submit' name='salvar' value='pressionado'>Salvar</button>");
+            saida.println("        <a href='helpdesk?acao=listar'>Cancelar<a/>");
+            saida.println("    </form>");
+        }
+
+        saida.println("</body>");
+        saida.println("</html>");
     }
 }
