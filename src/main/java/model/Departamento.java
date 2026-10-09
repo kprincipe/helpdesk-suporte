@@ -6,6 +6,13 @@ public class Departamento {
     private String sigla;
     private  String responsavel;
 
+    public Departamento(String codigo, String nome, String sigla, String responsavel) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.sigla = sigla;
+        this.responsavel = responsavel;
+    }
+
     public String getCodigo() {
         return this.codigo;
     }

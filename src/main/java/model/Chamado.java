@@ -8,6 +8,15 @@ public class Chamado {
     private Integer salaAtendimento;
     private Departamento departamento;
 
+    public Chamado (String titulo, String solicitante, String descricao, Integer codigoEquipamento, Integer salaAtendimento, Departamento departamento) {
+        this.titulo = titulo;
+        this.solicitante = solicitante;
+        this.descricao = descricao;
+        this.codigoEquipamento = codigoEquipamento;
+        this.salaAtendimento = salaAtendimento;
+        this.departamento = departamento;
+    }
+
     public String getTitulo() {
         return titulo;
     }
