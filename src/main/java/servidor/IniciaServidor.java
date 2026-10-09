@@ -9,20 +9,20 @@ import java.io.File;
 
 public class IniciaServidor {
     public static void main(String[] args) throws LifecycleException {
-        Tomcat tomcat = new Tomcat();
+        Tomcat tomcat = new Tomcat(); // Instancia Tomcat para servidor web
 
-        tomcat.setPort(8080);
+        tomcat.setPort(8080); // Define porta de acesso
         tomcat.getConnector(); // Inicia o conector http
 
-        String webapp = new File("src/main/webapp").getAbsolutePath();
-        Context context = tomcat.addWebapp("", webapp);
+        String webapp = new File("src/main/webapp").getAbsolutePath(); // Obtém diretório da aplicação web
+        Context context = tomcat.addWebapp("", webapp); // Conecta aplicação ao contexto do Tomcat
 
-        String nomeServlet = "HelpdeskServlet";
+        String nomeServlet = "HelpdeskServlet"; // Define nome da rota para o servlet do helpdesk
 
-        Tomcat.addServlet(context, nomeServlet, new HelpdeskServlet());
-        context.addServletMappingDecoded("/helpdesk", nomeServlet);
+        Tomcat.addServlet(context, nomeServlet, new HelpdeskServlet()); // Adiciona servlet ao contexto do Tomcat
+        context.addServletMappingDecoded("/helpdesk", nomeServlet); // Mapeia rota do servlet
 
-        tomcat.start();
-        tomcat.getServer().await();
+        tomcat.start(); // Inicializa servidor Tomcat
+        tomcat.getServer().await(); // Recebe respostas do clientes2
     }
 }
