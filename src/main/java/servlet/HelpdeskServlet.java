@@ -86,6 +86,52 @@ public class HelpdeskServlet extends HttpServlet {
             pesquisa = "";
         }
 
+        if (acao.equals("excluir")) {
+            String idExcluir = req.getParameter("id");
+
+            if (idExcluir != null && !idExcluir.isEmpty()) {
+
+                int indice = Integer.parseInt(idExcluir);
+
+                if (indice >= 0 && indice < chamados.size()) {
+                    chamados.remove(indice);
+                }
+            }
+            res.sendRedirect("helpdesk");
+        }
+
+        String botaoSalvar = req.getParameter("salvar");
+        if (botaoSalvar != null) {
+            String parId = req.getParameter("id");
+
+            String titulo = req.getParameter("titulo");
+            String solicitante = req.getParameter("solicitante");
+            String descricao = req.getParameter("descricao");
+            String codigoEquip = req.getParameter("codigoequip");
+            String salaAtendimento = req.getParameter("sala");
+            String departamento = req.getParameter("departamento");
+
+            Departamento departamentoSelecionado = departamentos.get(Integer.parseInt(departamento));
+
+            if (parId == null || parId.equals("")) {
+                Chamado novoChamado = new Chamado(titulo, solicitante, descricao, Integer.parseInt(codigoEquip), Integer.parseInt(salaAtendimento), departamentoSelecionado);
+
+                chamados.add(novoChamado);
+
+            } else {
+                int indice = Integer.parseInt(parId);
+                Chamado chamadoAlteraco = chamados.get(indice);
+
+                chamadoAlteraco.setTitulo(titulo);
+                chamadoAlteraco.setSolicitante(solicitante);
+                chamadoAlteraco.setDescricao(descricao);
+                chamadoAlteraco.setCodigoEquipamento(Integer.parseInt(codigoEquip));
+                chamadoAlteraco.setSalaAtendimento(Integer.parseInt(salaAtendimento));
+                chamadoAlteraco.setDepartamento(departamentoSelecionado);
+            }
+            res.sendRedirect("helpdesk");
+        }
+
         res.setContentType("text/html;charset=UTF-8");
 
         // Cabeçalho
@@ -94,7 +140,13 @@ public class HelpdeskServlet extends HttpServlet {
 
         saida.println("<head>");
         saida.println("    <meta charset=\"UTF-8\">");
-        saida.println("    <title>Ola IFAM!</title>");
+        saida.println("    <title>Helpdesk Suporte</title>");
+        saida.println("    <style>html *\n" +
+                "{\n" +
+                "   font-size: 0.9em !important;\n" +
+                "   color: #000 !important;\n" +
+                "   font-family: \"Comic Sans MS\", sans-serif;\n" +
+                "}</style>");
         saida.println("</head>");
 
         saida.println("<body>");
@@ -102,7 +154,7 @@ public class HelpdeskServlet extends HttpServlet {
 
         // Definição de ações
         if (acao.equals("listar")) {
-            saida.println("<a href=\"helpdesk?acao=criar\">Criar Chamado</a>");
+            saida.println("<a href=\"helpdesk?acao=criar\">+ Criar Chamado</a><br><br>");
 
             saida.println("    <form method='GET' action='helpdesk'>");
             saida.println("        <label type='text' id='filtroPesquisar' name='pesquisa' value='' >Buscar</label>");
@@ -110,7 +162,7 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <button type=\"submit\">Pesquisar</button>");
             saida.println("    </form>");
 
-            saida.println("    <table border=\"1px\">");
+            saida.println("    <table border=\"1px\" style='    text-align: center; border: 2px inset; border-collapse: collapse;'>");
             saida.println("        <caption>Lista de chamados</caption>");
             saida.println("        <thead>");
             saida.println("            <tr>");
@@ -163,7 +215,7 @@ public class HelpdeskServlet extends HttpServlet {
 
             saida.println("    <h2>" + titulo +"</h2>");
 
-            saida.println("    <form method='POST' action='helpdesk'>");
+            saida.println("    <form method='GET' action='helpdesk'>");
 
             saida.println("        <input type='hidden' id='id' name='id' value='" +
                     (chamadoEdicao != null ? idAlterar : "") + "'></input>");
@@ -177,7 +229,7 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <br>");
 
             saida.println("        <label type='text' for='campoDescricao'>Descricao: </label><br>");
-            saida.println("        <textarea id='campoDescricao' name='descricao'  placeholder='Descrição' required>" + (chamadoEdicao != null ? chamadoEdicao.getDescricao() : "") + " </textarea>");
+            saida.println("        <textarea id='campoDescricao' name='descricao'  placeholder='Descrição' required>" + (chamadoEdicao != null ? chamadoEdicao.getDescricao() : "") + "</textarea>");
             saida.println("        <br>");
 
             saida.println("        <label type='text' for='campoCodigoEquip'>Código do Equipamento: </label><br>");
@@ -194,7 +246,7 @@ public class HelpdeskServlet extends HttpServlet {
             for (int i = 0; i < departamentos.size(); ++i) {
                 boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getDepartamento() != null);
 
-                saida.println("        <option value=" + i + " " + (selecionada ? "selected" : "") + ">" + departamentos.get(i).getSigla() + "</option>");
+                saida.println("        <option value='" + i + "' " + (selecionada ? "selected" : "") + ">" + departamentos.get(i).getSigla() + "</option>");
             }
 
             saida.println("        </select>");
