@@ -31,7 +31,8 @@ public class HelpdeskServlet extends HttpServlet {
                 "Não consigo lançar notas, pois o SIGAA está fora do ar",
                 10001,
                 2,
-                DAIC);
+                DAIC,
+                "Alto");
 
         Departamento CAPNE = new Departamento(
                 "CAPNEDUQ",
@@ -45,7 +46,8 @@ public class HelpdeskServlet extends HttpServlet {
                 "Monitor queimou por causa de uma goteira",
                 12003,
                 1,
-                CAPNE);
+                CAPNE,
+                "Alto");
 
         Departamento BPPS = new Departamento(
                 "BIBLIOCDI",
@@ -59,7 +61,8 @@ public class HelpdeskServlet extends HttpServlet {
                 "O WI-FI fica lento no almoço",
                 13025,
                 1,
-                BPPS);
+                BPPS,
+                "Médio");
 
         departamentos.add(DAIC);
         departamentos.add(CAPNE);
@@ -111,10 +114,13 @@ public class HelpdeskServlet extends HttpServlet {
             String salaAtendimento = req.getParameter("sala");
             String departamento = req.getParameter("departamento");
 
+            // adicao da prioridade
+            String prioridade = req.getParameter("prioridade");
+
             Departamento departamentoSelecionado = departamentos.get(Integer.parseInt(departamento));
 
             if (parId == null || parId.equals("")) {
-                Chamado novoChamado = new Chamado(titulo, solicitante, descricao, Integer.parseInt(codigoEquip), Integer.parseInt(salaAtendimento), departamentoSelecionado);
+                Chamado novoChamado = new Chamado(titulo, solicitante, descricao, Integer.parseInt(codigoEquip), Integer.parseInt(salaAtendimento), departamentoSelecionado, prioridade);
 
                 chamados.add(novoChamado);
 
@@ -128,6 +134,7 @@ public class HelpdeskServlet extends HttpServlet {
                 chamadoAlteraco.setCodigoEquipamento(Integer.parseInt(codigoEquip));
                 chamadoAlteraco.setSalaAtendimento(Integer.parseInt(salaAtendimento));
                 chamadoAlteraco.setDepartamento(departamentoSelecionado);
+                chamadoAlteraco.setPrioridade(prioridade);
             }
             res.sendRedirect("helpdesk");
         }
@@ -238,6 +245,11 @@ public class HelpdeskServlet extends HttpServlet {
 
             saida.println("        <label type='text' for='campoSala'>Sala: </label><br>");
             saida.println("        <input type='text' id='campoSala' name='sala' value='" + (chamadoEdicao != null ? chamadoEdicao.getSalaAtendimento() : "") + "' placeholder='2' required></input>");
+            saida.println("        <br>");
+
+            // adicao do campo de teste 
+            saida.println("        <label type='text' for='campoPrioridade'>Prioridade: </label><br>");
+            saida.println("        <input type='text' id='campoPrioridade' name='prioridade' value='" + (chamadoEdicao != null ? chamadoEdicao.getPrioridade() : "") + "' placeholder='Alto' required></input>");
             saida.println("        <br>");
 
             saida.println("        <label type='text' for='campoDepartamento'>Departamento: </label><br>");

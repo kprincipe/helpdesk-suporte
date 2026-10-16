@@ -8,13 +8,17 @@ public class Chamado {
     private Integer salaAtendimento;
     private Departamento departamento;
 
-    public Chamado (String titulo, String solicitante, String descricao, Integer codigoEquipamento, Integer salaAtendimento, Departamento departamento) {
+    // Adição do atributo prioridade
+    private String prioridade;
+
+    public Chamado (String titulo, String solicitante, String descricao, Integer codigoEquipamento, Integer salaAtendimento, Departamento departamento, String prioridade) {
         this.titulo = titulo;
         this.solicitante = solicitante;
         this.descricao = descricao;
         this.codigoEquipamento = codigoEquipamento;
         this.salaAtendimento = salaAtendimento;
         this.departamento = departamento;
+        this.prioridade = prioridade;
     }
 
     public String getTitulo() {
@@ -64,4 +68,8 @@ public class Chamado {
     public void setDepartamento(Departamento departamento) {
         this.departamento = departamento;
     }
+
+    public String getPrioridade() { return prioridade; }
+
+    public void setPrioridade(String prioridade) { this.prioridade = prioridade; }
 }
