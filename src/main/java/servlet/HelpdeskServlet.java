@@ -14,10 +14,20 @@ import java.util.ArrayList;
 public class HelpdeskServlet extends HttpServlet {
     private ArrayList<Departamento> departamentos;
     private ArrayList<Chamado> chamados;
+    private ArrayList<String> prioridade; // lista de opcoes de prioridade
 
     public void init() {
         this.departamentos = new ArrayList<Departamento>();
         this.chamados = new ArrayList<Chamado>();
+        this.prioridade = new ArrayList<String>();
+
+        String baixa = "BAIXA";
+        String media = "MEDIA";
+        String urgente = "URGENTE";
+
+        prioridade.add(baixa);
+        prioridade.add(media);
+        prioridade.add(urgente);
 
         Departamento DAIC = new Departamento(
                 "DAIC7SET",
@@ -32,7 +42,7 @@ public class HelpdeskServlet extends HttpServlet {
                 10001,
                 2,
                 DAIC,
-                "Alto");
+                prioridade.get(1));
 
         Departamento CAPNE = new Departamento(
                 "CAPNEDUQ",
@@ -47,7 +57,7 @@ public class HelpdeskServlet extends HttpServlet {
                 12003,
                 1,
                 CAPNE,
-                "Alto");
+                prioridade.get(0));
 
         Departamento BPPS = new Departamento(
                 "BIBLIOCDI",
@@ -62,7 +72,7 @@ public class HelpdeskServlet extends HttpServlet {
                 13025,
                 1,
                 BPPS,
-                "Médio");
+                prioridade.get(1));
 
         departamentos.add(DAIC);
         departamentos.add(CAPNE);
@@ -114,13 +124,12 @@ public class HelpdeskServlet extends HttpServlet {
             String salaAtendimento = req.getParameter("sala");
             String departamento = req.getParameter("departamento");
 
-            // adicao da prioridade
-            String prioridade = req.getParameter("prioridade");
-
+            // indice da lista de prioridade
+            int indiciePrioridade = Integer.parseInt(req.getParameter("prioridade"));
             Departamento departamentoSelecionado = departamentos.get(Integer.parseInt(departamento));
 
             if (parId == null || parId.equals("")) {
-                Chamado novoChamado = new Chamado(titulo, solicitante, descricao, Integer.parseInt(codigoEquip), Integer.parseInt(salaAtendimento), departamentoSelecionado, prioridade);
+                Chamado novoChamado = new Chamado(titulo, solicitante, descricao, Integer.parseInt(codigoEquip), Integer.parseInt(salaAtendimento), departamentoSelecionado, prioridade.get(indiciePrioridade));
 
                 chamados.add(novoChamado);
 
@@ -134,7 +143,7 @@ public class HelpdeskServlet extends HttpServlet {
                 chamadoAlteraco.setCodigoEquipamento(Integer.parseInt(codigoEquip));
                 chamadoAlteraco.setSalaAtendimento(Integer.parseInt(salaAtendimento));
                 chamadoAlteraco.setDepartamento(departamentoSelecionado);
-                chamadoAlteraco.setPrioridade(prioridade);
+                chamadoAlteraco.setPrioridade(this.prioridade.get(indiciePrioridade));
             }
             res.sendRedirect("helpdesk");
         }
@@ -174,7 +183,8 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <thead>");
             saida.println("            <tr>");
             saida.println("                <th>Título</th>");
-            saida.println("                <th>Solicitante/UF</th>");
+            saida.println("                <th>Solicitante</th>");
+            saida.println("                <th>Prioridade</th>");
             saida.println("                <th>Descrição</th>");
             saida.println("                <th>Código do Equipamento</th>");
             saida.println("                <th>Sala</th>");
@@ -191,6 +201,7 @@ public class HelpdeskServlet extends HttpServlet {
                 saida.println("                <tr>");
                 saida.println("                    <td>" + chamadoLista.getTitulo() + "</td>");
                 saida.println("                    <td>" + chamadoLista.getSolicitante() + "</td>");
+                saida.println("                    <td>" + chamadoLista.getPrioridade() + "</td>");
                 saida.println("                    <td>" + chamadoLista.getDescricao() + "</td>");
                 saida.println("                    <td>" + chamadoLista.getCodigoEquipamento().toString() + "</td>");
                 saida.println("                    <td>" + chamadoLista.getSalaAtendimento().toString() + "</td>");
@@ -247,11 +258,6 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <input type='text' id='campoSala' name='sala' value='" + (chamadoEdicao != null ? chamadoEdicao.getSalaAtendimento() : "") + "' placeholder='2' required></input>");
             saida.println("        <br>");
 
-            // adicao do campo de teste 
-            saida.println("        <label type='text' for='campoPrioridade'>Prioridade: </label><br>");
-            saida.println("        <input type='text' id='campoPrioridade' name='prioridade' value='" + (chamadoEdicao != null ? chamadoEdicao.getPrioridade() : "") + "' placeholder='Alto' required></input>");
-            saida.println("        <br>");
-
             saida.println("        <label type='text' for='campoDepartamento'>Departamento: </label><br>");
             saida.println("        <select id='campoDepartamento' name='departamento' value='" + (chamadoEdicao != null ? chamadoEdicao.getDepartamento().getSigla() : "") + "' required>");
 
@@ -262,8 +268,22 @@ public class HelpdeskServlet extends HttpServlet {
             }
 
             saida.println("        </select>");
-
             saida.println("        <br>");
+
+            // adicao do campo de teste
+            saida.println("        <label type='text' for='campoPrioridade'>Prioridade: </label><br>");
+            saida.println("        <select id='campoPrioridade' name='prioridade' value='" + (chamadoEdicao != null ? chamadoEdicao.getPrioridade() : "") + "' required>");
+
+            // size começa em 1
+            for (int i = 0; i < prioridade.size(); i++) {
+                boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getPrioridade() != null);
+
+                saida.println("        <option value='" + i + "' " + (selecionada ? "selected" : "") + ">" + prioridade.get(i) + "</option>"); // retorna indice da lista
+            }
+
+            saida.println("        </select>");
+            saida.println("        <br>");
+
             saida.println("        <button type='submit' name='salvar' value='pressionado'>Salvar</button>");
             saida.println("        <a href='helpdesk?acao=listar'>Cancelar<a/>");
             saida.println("    </form>");
