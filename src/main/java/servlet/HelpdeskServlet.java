@@ -183,7 +183,7 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <thead>");
             saida.println("            <tr>");
             saida.println("                <th>Título</th>");
-            saida.println("                <th>Solicitante</th>");
+            saida.println("                <th>Solicitante</th>");  
             saida.println("                <th>Prioridade</th>");
             saida.println("                <th>Descrição</th>");
             saida.println("                <th>Código do Equipamento</th>");
@@ -262,7 +262,7 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <select id='campoDepartamento' name='departamento' value='" + (chamadoEdicao != null ? chamadoEdicao.getDepartamento().getSigla() : "") + "' required>");
 
             for (int i = 0; i < departamentos.size(); ++i) {
-                boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getDepartamento() != null);
+                boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getDepartamento().equals(departamentos.get(i)));
 
                 saida.println("        <option value='" + i + "' " + (selecionada ? "selected" : "") + ">" + departamentos.get(i).getSigla() + "</option>");
             }
@@ -274,9 +274,8 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <label type='text' for='campoPrioridade'>Prioridade: </label><br>");
             saida.println("        <select id='campoPrioridade' name='prioridade' value='" + (chamadoEdicao != null ? chamadoEdicao.getPrioridade() : "") + "' required>");
 
-            // size começa em 1
             for (int i = 0; i < prioridade.size(); i++) {
-                boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getPrioridade() != null);
+                boolean selecionada = selecionada = (chamadoEdicao != null) && (chamadoEdicao.getPrioridade().equals(prioridade.get(i)));
 
                 saida.println("        <option value='" + i + "' " + (selecionada ? "selected" : "") + ">" + prioridade.get(i) + "</option>"); // retorna indice da lista
             }
