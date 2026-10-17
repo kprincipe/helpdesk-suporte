@@ -4,6 +4,16 @@ public class Chamado {
     private String titulo;
     private String solicitante;
     private String descricao;
+
+    public enum Status {
+        ABERTO,
+        EM_ATENDIMENTO,
+        RESOLVIDO,
+        CANCELADO
+    };
+
+    private Status status;
+
     private Integer codigoEquipamento;
     private Integer salaAtendimento;
     private Departamento departamento;
@@ -15,6 +25,25 @@ public class Chamado {
         this.codigoEquipamento = codigoEquipamento;
         this.salaAtendimento = salaAtendimento;
         this.departamento = departamento;
+        this.status = Status.ABERTO;
+    }
+
+    public static String getStatusString(Status s) {
+        return switch (s) {
+            case ABERTO -> "Aberto";
+            case EM_ATENDIMENTO -> "Em Atendimento";
+            case RESOLVIDO -> "Resolvido";
+            case CANCELADO -> "Cancelado";
+            default -> "Sem status";
+        };
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getTitulo() {

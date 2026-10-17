@@ -110,6 +110,7 @@ public class HelpdeskServlet extends HttpServlet {
             String codigoEquip = req.getParameter("codigoequip");
             String salaAtendimento = req.getParameter("sala");
             String departamento = req.getParameter("departamento");
+            String statusId = req.getParameter("status");
 
             Departamento departamentoSelecionado = departamentos.get(Integer.parseInt(departamento));
 
@@ -128,6 +129,10 @@ public class HelpdeskServlet extends HttpServlet {
                 chamadoAlteraco.setCodigoEquipamento(Integer.parseInt(codigoEquip));
                 chamadoAlteraco.setSalaAtendimento(Integer.parseInt(salaAtendimento));
                 chamadoAlteraco.setDepartamento(departamentoSelecionado);
+
+                if (statusId != null) {
+                    chamadoAlteraco.setStatus(Chamado.Status.values()[Integer.parseInt(statusId)]);
+                }
             }
             res.sendRedirect("helpdesk");
         }
@@ -167,12 +172,13 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <thead>");
             saida.println("            <tr>");
             saida.println("                <th>Título</th>");
-            saida.println("                <th>Solicitante/UF</th>");
+            saida.println("                <th>Solicitante</th>");
             saida.println("                <th>Descrição</th>");
             saida.println("                <th>Código do Equipamento</th>");
             saida.println("                <th>Sala</th>");
             saida.println("                <th>Departamento</th>");
             saida.println("                <th>Ação</th>");
+            saida.println("                <th>Status</th>");
             saida.println("            </tr>");
             saida.println("            <tbody>");
 
@@ -188,6 +194,7 @@ public class HelpdeskServlet extends HttpServlet {
                 saida.println("                    <td>" + chamadoLista.getCodigoEquipamento().toString() + "</td>");
                 saida.println("                    <td>" + chamadoLista.getSalaAtendimento().toString() + "</td>");
                 saida.println("                    <td>" + chamadoLista.getDepartamento().getSigla() + "</td>");
+                saida.println("                    <td>" + Chamado.getStatusString(chamadoLista.getStatus())+ "</td>");
                 saida.println("                    <td>");
                 saida.println("                        <a href=\"helpdesk?acao=alterar&id=" + i + "\">Alterar</a>");
                 saida.println("                        <a href=\"helpdesk?acao=excluir&id=" + i + "\" onclick=\"return confirm(\"Deseja realmente excluir?\");\">Excluir</a>");
@@ -239,6 +246,22 @@ public class HelpdeskServlet extends HttpServlet {
             saida.println("        <label type='text' for='campoSala'>Sala: </label><br>");
             saida.println("        <input type='text' id='campoSala' name='sala' value='" + (chamadoEdicao != null ? chamadoEdicao.getSalaAtendimento() : "") + "' placeholder='2' required></input>");
             saida.println("        <br>");
+
+            if (acao.equals("alterar")) {
+                saida.println("        <label type='text' for='campoStatus'>Status: </label><br>");
+                saida.println("        <select id='campoStatus' name='status' value='" + (chamadoEdicao != null ? chamadoEdicao.getStatus() : "") + "' required>");
+
+                int c = 0;
+                for (Chamado.Status s: Chamado.Status.values()) {
+                    boolean selecionada = (chamadoEdicao != null) && (chamadoEdicao.getStatus() == s);
+
+                    saida.println("        <option value='" + c + "' " + (selecionada ? "selected" : "") + ">" + Chamado.getStatusString(s) + "</option>");
+                    c++;
+                }
+
+                saida.println("        </select>");
+                saida.println("        <br>");
+            }
 
             saida.println("        <label type='text' for='campoDepartamento'>Departamento: </label><br>");
             saida.println("        <select id='campoDepartamento' name='departamento' value='" + (chamadoEdicao != null ? chamadoEdicao.getDepartamento().getSigla() : "") + "' required>");
